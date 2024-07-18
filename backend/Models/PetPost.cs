@@ -11,8 +11,7 @@ namespace PetBlog.Models
 
         public required string Title { get; set; }
         public required string Content { get; set; }
-        public string? ImageUrl { get; set; }
+        public required string ImageUrl { get; set; }
         public DateTime CreateAt { get; set; } = DateTime.Now;
-        public required string UserId { get; set; }
     }
 }

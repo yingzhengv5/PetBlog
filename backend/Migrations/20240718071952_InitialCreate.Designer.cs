@@ -12,7 +12,7 @@ using PetBlog.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(PetBlogContext))]
-    [Migration("20240711220039_InitialCreate")]
+    [Migration("20240718071952_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -41,13 +41,10 @@ namespace backend.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("ImageUrl")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("UserId")
+                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 

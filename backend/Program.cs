@@ -14,14 +14,25 @@ builder.Services.AddDbContext<PetBlogContext>(options =>
 
 builder.Services.AddScoped<IPetPostRepository, PetPostRepository>();
 
+// Allow CORS
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowReactApp", policy =>
         {
-            policy.WithOrigins("http://localhost:3000")
+            policy.WithOrigins("http://localhost:5173")
             .AllowAnyHeader().AllowAnyMethod();
         });
     });
+
+// builder.Services.AddCors(options =>
+// {
+//     options.AddDefaultPolicy(policy =>
+//     {
+//         policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
+//             .AllowAnyHeader()
+//             .AllowAnyOrigin(); // For localhost only. Allow all
+//     });
+// });
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
