@@ -77,7 +77,7 @@ namespace PetBlog.Controllers
 
         //Put: api/PetPosts/1
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePetPost(long id, [FromForm] PetPost petPost, [FromForm] IFormFile[]? images, [FromForm] string[] existingImages)
+        public async Task<IActionResult> UpdatePetPost(long id, [FromForm] PetPost petPost, [FromForm] IFormFile[]? images, [FromForm] string[] existingImages, [FromForm] string[] deletedImages)
         {
             if (id != petPost.Id)
             {
@@ -111,7 +111,27 @@ namespace PetBlog.Controllers
                     }
                 }
 
-                petPost.ImageUrls = imageUrls.Count > 0 ? imageUrls : null; // Keep existing URLs if no new images
+                // Handle deleted images
+                if (deletedImages != null && deletedImages.Length > 0)
+                {
+                    foreach (var imageUrl in deletedImages)
+                    {
+                        // Extract public ID from URL
+                        var publicId = imageUrl.Split('/').Last().Split('.').First();
+                        await _cloudinary.DestroyAsync(new DeletionParams(publicId));
+                    }
+
+                    // Remove deleted images from the combined list
+                    imageUrls = imageUrls.Except(deletedImages).ToList();
+                }
+
+                // Check if no images are left and set default image
+                if (!imageUrls.Any())
+                {
+                    imageUrls.Add(_defaultImageUrl);
+                }
+
+                petPost.ImageUrls = imageUrls.Count > 0 ? imageUrls : null;
 
                 await _repository.UpdatePetPostAsync(petPost);
             }

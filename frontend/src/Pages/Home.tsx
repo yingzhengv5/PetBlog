@@ -3,7 +3,6 @@ import { Box, Container, Grid, Paper, Typography } from "@mui/material";
 import { getPosts } from "../Services/Api";
 import { Post } from "../Models/Post";
 import { Link } from "react-router-dom";
-import { compareDesc, parseISO } from "date-fns";
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -11,11 +10,7 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await getPosts();
-      // Sort the layout by created time
-      const sortedPosts = response.data.sort((a, b) =>
-        compareDesc(parseISO(a.createAt), parseISO(b.createAt))
-      );
-      setPosts(sortedPosts);
+      setPosts(response.data);
     };
 
     fetchPosts();
