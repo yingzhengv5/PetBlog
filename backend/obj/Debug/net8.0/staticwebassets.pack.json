@@ -1,0 +1,45 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/1daae2b7-3091-413c-8d20-661ccb1f5caa_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg",
+      "PackagePath": "staticwebassets/1daae2b7-3091-413c-8d20-661ccb1f5caa_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg"
+    },
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/affd006b-598b-4665-ad26-006d54206cae_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg",
+      "PackagePath": "staticwebassets/affd006b-598b-4665-ad26-006d54206cae_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg"
+    },
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/uploads/55e5a1d2-1d70-44a3-a1f6-0de738d7216a_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg",
+      "PackagePath": "staticwebassets/uploads/55e5a1d2-1d70-44a3-a1f6-0de738d7216a_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg"
+    },
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/uploads/743a3a03-fd77-4416-929c-3395ed213edd_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg",
+      "PackagePath": "staticwebassets/uploads/743a3a03-fd77-4416-929c-3395ed213edd_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg"
+    },
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/uploads/9ff68990-5bc9-41f9-8bf5-afff02a759d8_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg",
+      "PackagePath": "staticwebassets/uploads/9ff68990-5bc9-41f9-8bf5-afff02a759d8_C8574802-EAFD-4F6D-92C5-3B8370B302ED.jpeg"
+    },
+    {
+      "Id": "/Users/zhengying/Desktop/p/PetBlog/backend/wwwroot/uploads/icon.png",
+      "PackagePath": "staticwebassets/uploads/icon.png"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.backend.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.backend.props",
+      "PackagePath": "build\\backend.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.backend.props",
+      "PackagePath": "buildMultiTargeting\\backend.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.backend.props",
+      "PackagePath": "buildTransitive\\backend.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

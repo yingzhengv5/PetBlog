@@ -16,13 +16,21 @@ export const getPostById = async (id: number) => {
 };
 
 // Add a new post
-export const addPost = async (post: Omit<Post, "id" | "createAt">) => {
-  return await api.post<Post>("/petpost", post);
+export const addPost = async (postData: FormData) => {
+  return await api.post<Post>("/petpost", postData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // Update a post
-export const updatePost = async (id: number, post: Omit<Post, "createAt">) => {
-  return await api.put(`/petpost/${id}`, post);
+export const updatePost = async (id: number, postData: FormData) => {
+  return await api.put<Post>(`/petpost/${id}`, postData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 };
 
 // delete a post

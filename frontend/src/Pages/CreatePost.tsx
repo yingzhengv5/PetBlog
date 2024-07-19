@@ -14,13 +14,22 @@ import { useNavigate } from "react-router-dom";
 const CreatePost: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<File[]>([]);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("content", content);
+
+    images.forEach((image) => {
+      formData.append("images", image);
+    });
+
     try {
-      const newPost = await addPost({ title, content, imageUrl });
+      const newPost = await addPost(formData);
       navigate(`/posts/${newPost.data.id}`);
     } catch (error) {
       console.error("Failed to create post:", error);
@@ -35,7 +44,7 @@ const CreatePost: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             Create New Post
           </Typography>
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} encType="multipart/form-data">
             <TextField
               label="Title"
               fullWidth
@@ -52,12 +61,13 @@ const CreatePost: React.FC = () => {
               margin="normal"
               required
             />
-            <TextField
-              label="Image URL"
-              fullWidth
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              margin="normal"
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) =>
+                setImages(e.target.files ? Array.from(e.target.files) : [])
+              }
             />
             <CardActions sx={{ justifyContent: "center", paddingBottom: 2 }}>
               <Button
