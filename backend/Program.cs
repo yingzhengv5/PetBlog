@@ -1,9 +1,12 @@
-
+using CloudinaryDotNet;
+using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using PetBlog.Data;
 using PetBlog.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Env.Load();
 
 //Add services to the container
 builder.Services.AddControllers();
@@ -14,26 +17,24 @@ builder.Services.AddDbContext<PetBlogContext>(options =>
 
 builder.Services.AddScoped<IPetPostRepository, PetPostRepository>();
 
+// Add Cloudinary configuration
+builder.Services.AddSingleton(new Cloudinary(new Account(
+    Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME"),
+    Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY"),
+    Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET")
+)));
+
 // Allow CORS
 builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowReactApp", policy =>
         {
             policy.WithOrigins("http://localhost:5173")
-            .AllowAnyHeader().AllowAnyMethod();
+            .AllowAnyHeader().AllowAnyMethod().AllowCredentials();
         });
     });
 
-// builder.Services.AddCors(options =>
-// {
-//     options.AddDefaultPolicy(policy =>
-//     {
-//         policy.SetIsOriginAllowed(origin => new Uri(origin).Host == "localhost")
-//             .AllowAnyHeader()
-//             .AllowAnyOrigin(); // For localhost only. Allow all
-//     });
-// });
-
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -50,6 +51,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
+
 app.MapControllers();
 
 app.Run();

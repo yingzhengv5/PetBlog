@@ -114,3 +114,8 @@
 /Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 /Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/Microsoft.IdentityModel.Tokens.dll
 /Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/System.IdentityModel.Tokens.Jwt.dll
+/Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/backend.staticwebassets.runtime.json
+/Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/CloudinaryDotNet.dll
+/Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/DotNetEnv.dll
+/Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/Sprache.dll
+/Users/zhengying/Desktop/p/PetBlog/backend/bin/Debug/net8.0/Newtonsoft.Json.dll

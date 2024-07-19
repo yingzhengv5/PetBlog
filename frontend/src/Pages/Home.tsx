@@ -3,6 +3,7 @@ import { Box, Container, Grid, Paper, Typography } from "@mui/material";
 import { getPosts } from "../Services/Api";
 import { Post } from "../Models/Post";
 import { Link } from "react-router-dom";
+import { compareDesc, parseISO } from "date-fns";
 
 const Home: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -10,7 +11,11 @@ const Home: React.FC = () => {
   useEffect(() => {
     const fetchPosts = async () => {
       const response = await getPosts();
-      setPosts(response.data);
+      // Sort the layout by created time
+      const sortedPosts = response.data.sort((a, b) =>
+        compareDesc(parseISO(a.createAt), parseISO(b.createAt))
+      );
+      setPosts(sortedPosts);
     };
 
     fetchPosts();
@@ -37,15 +42,17 @@ const Home: React.FC = () => {
               style={{ textDecoration: "none", color: "inherit" }}>
               <Box>
                 <Paper elevation={8} style={{ padding: "16px" }}>
-                  <img
-                    src={post.imageUrl}
-                    alt={post.title}
-                    style={{
-                      width: "100%",
-                      height: "350px",
-                      objectFit: "cover",
-                    }}
-                  />
+                  {post.imageUrls.length > 0 && (
+                    <img
+                      src={post.imageUrls[0]}
+                      alt={post.title}
+                      style={{
+                        width: "100%",
+                        height: "350px",
+                        objectFit: "cover",
+                      }}
+                    />
+                  )}
                   <Typography variant="h6">{post.title}</Typography>
                 </Paper>
               </Box>

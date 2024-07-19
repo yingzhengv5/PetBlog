@@ -16,7 +16,8 @@ const EditPost: React.FC = () => {
   const navigate = useNavigate();
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [imageUrl, setImageUrl] = useState("");
+  const [images, setImages] = useState<File[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -24,7 +25,7 @@ const EditPost: React.FC = () => {
         const response = await getPostById(Number(id));
         setTitle(response.data.title);
         setContent(response.data.content);
-        setImageUrl(response.data.imageUrl || "");
+        setExistingImages(response.data.imageUrls || []);
       }
     };
 
@@ -34,13 +35,28 @@ const EditPost: React.FC = () => {
   const handleUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
     if (id) {
-      await updatePost(Number(id), {
-        id: Number(id),
-        title,
-        content,
-        imageUrl,
+      const formData = new FormData();
+      formData.append("id", id);
+      formData.append("title", title);
+      formData.append("content", content);
+
+      // Add existing images
+      existingImages.forEach((url) => {
+        formData.append("existingImages", url);
       });
-      navigate(`/posts/${id}`);
+
+      // Add new images
+      images.forEach((image) => {
+        formData.append("images", image);
+      });
+
+      try {
+        await updatePost(Number(id), formData);
+        navigate(`/posts/${id}`);
+      } catch (error) {
+        console.error("Failed to update post:", error);
+        alert("Failed to update post. Please try again.");
+      }
     }
   };
 
@@ -68,13 +84,13 @@ const EditPost: React.FC = () => {
               margin="normal"
               required
             />
-            <TextField
-              label="Image URL"
-              fullWidth
-              value={imageUrl}
-              onChange={(e) => setImageUrl(e.target.value)}
-              margin="normal"
-              required
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) =>
+                setImages(e.target.files ? Array.from(e.target.files) : [])
+              }
             />
             <CardActions sx={{ justifyContent: "center", paddingBottom: 2 }}>
               <Button

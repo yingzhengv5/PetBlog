@@ -12,8 +12,8 @@ using PetBlog.Data;
 namespace backend.Migrations
 {
     [DbContext(typeof(PetBlogContext))]
-    [Migration("20240718071952_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240719032648_updateCreateAt")]
+    partial class updateCreateAt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -40,8 +40,7 @@ namespace backend.Migrations
                     b.Property<DateTime>("CreateAt")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
+                    b.Property<string>("ImageUrls")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Title")

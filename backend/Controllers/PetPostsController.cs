@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Http.HttpResults;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PetBlog.Models;
@@ -11,10 +12,13 @@ namespace PetBlog.Controllers
     public class PetPostController : ControllerBase
     {
         private readonly IPetPostRepository _repository;
+        private readonly Cloudinary _cloudinary;
+        private readonly string _defaultImageUrl = "http://res.cloudinary.com/dev7ehsz4/image/upload/v1721350123/ghbgjup4fh4lhvibfdox.png";
 
-        public PetPostController(IPetPostRepository repository)
+        public PetPostController(IPetPostRepository repository, Cloudinary cloudinary)
         {
             _repository = repository;
+            _cloudinary = cloudinary;
         }
 
         // GET: api/PetPosts
@@ -40,15 +44,40 @@ namespace PetBlog.Controllers
 
         //Post: api/PetPosts
         [HttpPost]
-        public async Task<ActionResult<PetPost>> AddPetPost(PetPost petPost)
+        public async Task<ActionResult<PetPost>> AddPetPost([FromForm] PetPost petPost, [FromForm] IFormFile[]? images)
         {
+            var imageUrls = new List<string>();
+
+            if (images != null && images.Length > 0)
+            {
+                foreach (var image in images)
+                {
+                    var uploadResult = new ImageUploadResult();
+                    using (var stream = image.OpenReadStream())
+                    {
+                        var uploadParams = new ImageUploadParams()
+                        {
+                            File = new FileDescription(image.FileName, stream)
+                        };
+                        uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                        imageUrls.Add(uploadResult.SecureUrl.AbsoluteUri);
+                    }
+                }
+
+                petPost.ImageUrls = imageUrls; // Assuming you have updated your model to handle multiple URLs
+            }
+            else
+            {
+                petPost.ImageUrls = new List<string> { _defaultImageUrl }; // Default image
+            }
+
             await _repository.AddPetPostAsync(petPost);
             return CreatedAtAction(nameof(GetPetPost), new { id = petPost.Id }, petPost);
         }
 
         //Put: api/PetPosts/1
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdatePetPost(long id, PetPost petPost)
+        public async Task<IActionResult> UpdatePetPost(long id, [FromForm] PetPost petPost, [FromForm] IFormFile[]? images, [FromForm] string[] existingImages)
         {
             if (id != petPost.Id)
             {
@@ -57,6 +86,33 @@ namespace PetBlog.Controllers
 
             try
             {
+                // Combine existing images and new images
+                var imageUrls = new List<string>();
+
+                if (existingImages != null && existingImages.Length > 0)
+                {
+                    imageUrls.AddRange(existingImages);
+                }
+
+                if (images != null && images.Length > 0)
+                {
+                    foreach (var image in images)
+                    {
+                        var uploadResult = new ImageUploadResult();
+                        using (var stream = image.OpenReadStream())
+                        {
+                            var uploadParams = new ImageUploadParams()
+                            {
+                                File = new FileDescription(image.FileName, stream)
+                            };
+                            uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                            imageUrls.Add(uploadResult.SecureUrl.AbsoluteUri);
+                        }
+                    }
+                }
+
+                petPost.ImageUrls = imageUrls.Count > 0 ? imageUrls : null; // Keep existing URLs if no new images
+
                 await _repository.UpdatePetPostAsync(petPost);
             }
             catch (DbUpdateConcurrencyException)
