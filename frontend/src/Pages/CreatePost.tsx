@@ -7,7 +7,13 @@ import {
   Card,
   CardContent,
   CardActions,
+  Grid,
+  Box,
+  IconButton,
+  CircularProgress,
 } from "@mui/material";
+import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 import { addPost } from "../Services/Api";
 import { useNavigate } from "react-router-dom";
 
@@ -15,10 +21,12 @@ const CreatePost: React.FC = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsSubmitting(true); // Start loading
 
     const formData = new FormData();
     formData.append("title", title);
@@ -34,7 +42,24 @@ const CreatePost: React.FC = () => {
     } catch (error) {
       console.error("Failed to create post:", error);
       alert("Failed to create post. Please try again.");
+    } finally {
+      setIsSubmitting(false); // Stop loading
     }
+  };
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImages(e.target.files ? Array.from(e.target.files) : []);
+  };
+
+  const handleButtonClick = () => {
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const handleImageDelete = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
   };
 
   return (
@@ -60,22 +85,71 @@ const CreatePost: React.FC = () => {
               onChange={(e) => setContent(e.target.value)}
               margin="normal"
               required
+              multiline
+              rows={6}
             />
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(e) =>
-                setImages(e.target.files ? Array.from(e.target.files) : [])
-              }
-            />
-            <CardActions sx={{ justifyContent: "center", paddingBottom: 2 }}>
+            <Grid container justifyContent="center" sx={{ marginTop: 2 }}>
+              <Button
+                component="label"
+                variant="contained"
+                startIcon={<DriveFolderUploadIcon />}
+                onClick={handleButtonClick}
+                sx={{
+                  justifyContent: "center",
+                  fontSize: "small",
+                }}>
+                Upload Image
+              </Button>
+              <input
+                id="file-input"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleFileChange}
+                style={{ display: "none" }}
+              />
+            </Grid>
+            {images.length > 0 && (
+              <Box mt={2}>
+                <Grid container>
+                  {images.map((image, index) => (
+                    <Grid item xs={3} key={index}>
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                          margin: "5px",
+                        }}>
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt="Thumbnail"
+                          style={{ width: "100px", height: "100px" }}
+                        />
+                        <IconButton
+                          onClick={() => handleImageDelete(index)}
+                          style={{
+                            position: "absolute",
+                            top: "0",
+                            right: "0",
+                            backgroundColor: "rgba(255, 255, 255, 0.7)",
+                          }}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </Grid>
+                  ))}
+                </Grid>
+              </Box>
+            )}
+            <CardActions sx={{ justifyContent: "center" }}>
               <Button
                 type="submit"
                 variant="contained"
-                color="primary"
-                sx={{ marginTop: 2, width: "90%" }}>
-                Create
+                // color="primary"
+                sx={{ marginTop: 2, width: "100%" }}
+                disabled={isSubmitting} // Disable button while submitting
+              >
+                {isSubmitting ? <CircularProgress size={24} /> : "Create"}
               </Button>
             </CardActions>
           </form>

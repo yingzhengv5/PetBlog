@@ -8,7 +8,13 @@ import {
   Card,
   CardContent,
   CardActions,
+  IconButton,
+  Grid,
+  Box,
+  CircularProgress,
 } from "@mui/material";
+import DeleteIcon from "@mui/icons-material/Delete";
+import DriveFolderUploadIcon from "@mui/icons-material/DriveFolderUpload";
 import { getPostById, updatePost } from "../Services/Api";
 
 const EditPost: React.FC = () => {
@@ -18,6 +24,8 @@ const EditPost: React.FC = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [deletedImages, setDeletedImages] = useState<string[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false); // Add state for loading
 
   useEffect(() => {
     const fetchPost = async () => {
@@ -35,6 +43,8 @@ const EditPost: React.FC = () => {
   const handleUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
     if (id) {
+      setIsSubmitting(true); // Start loading
+
       const formData = new FormData();
       formData.append("id", id);
       formData.append("title", title);
@@ -43,6 +53,10 @@ const EditPost: React.FC = () => {
       // Add existing images
       existingImages.forEach((url) => {
         formData.append("existingImages", url);
+      });
+
+      deletedImages.forEach((url) => {
+        formData.append("deletedImages", url);
       });
 
       // Add new images
@@ -57,8 +71,34 @@ const EditPost: React.FC = () => {
         console.error("Failed to update post:", error);
         alert("Failed to update post. Please try again.");
       }
+      setIsSubmitting(false); // Stop loading
     }
   };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImages(e.target.files ? Array.from(e.target.files) : []);
+  };
+
+  const handleButtonClick = () => {
+    const fileInput = document.getElementById("file-input") as HTMLInputElement;
+    if (fileInput) {
+      fileInput.click();
+    }
+  };
+
+  const handleImageDelete = (index: number) => {
+    const newImages = images.filter((_, i) => i !== index);
+    setImages(newImages);
+  };
+
+  const handleExistingImageDelete = (url: string) => {
+    setExistingImages(existingImages.filter((image) => image !== url));
+    setDeletedImages([...deletedImages, url]);
+  };
+  // const handleImageDelete = (url: string) => {
+  //   setExistingImages(existingImages.filter((image) => image !== url));
+  //   setDeletedImages([...deletedImages, url]);
+  // };
 
   return (
     <Container maxWidth="sm" sx={{ marginTop: 4 }}>
@@ -84,21 +124,93 @@ const EditPost: React.FC = () => {
               margin="normal"
               required
             />
+            <Button
+              component="label"
+              variant="contained"
+              // color="secondary"
+              startIcon={<DriveFolderUploadIcon />}
+              onClick={handleButtonClick}
+              sx={{
+                justifyContent: "center",
+                fontSize: "small",
+                marginY: 2,
+              }}>
+              Upload Image
+            </Button>
             <input
+              id="file-input"
               type="file"
               accept="image/*"
               multiple
-              onChange={(e) =>
-                setImages(e.target.files ? Array.from(e.target.files) : [])
-              }
+              onChange={handleFileChange}
+              style={{ display: "none" }}
             />
+            <Box mt={2}>
+              <Grid container>
+                {images.length > 0 &&
+                  images.map((image, index) => (
+                    <Grid item xs={3} key={index}>
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                          margin: "5px",
+                        }}>
+                        <img
+                          src={URL.createObjectURL(image)}
+                          alt="Thumbnail"
+                          style={{ width: "100px", height: "100px" }}
+                        />
+                        <IconButton
+                          onClick={() => handleImageDelete(index)}
+                          style={{
+                            position: "absolute",
+                            top: "0",
+                            right: "0",
+                            backgroundColor: "rgba(255, 255, 255, 0.7)",
+                          }}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </Grid>
+                  ))}
+                {existingImages.length > 0 &&
+                  existingImages.map((url) => (
+                    <Grid item xs={3} key={url}>
+                      <div
+                        style={{
+                          position: "relative",
+                          display: "inline-block",
+                          margin: "5px",
+                        }}>
+                        <img
+                          src={url}
+                          alt="Thumbnail"
+                          style={{ width: "100px", height: "100px" }}
+                        />
+                        <IconButton
+                          onClick={() => handleExistingImageDelete(url)}
+                          style={{
+                            position: "absolute",
+                            top: "0",
+                            right: "0",
+                            backgroundColor: "rgba(255, 255, 255, 0.7)",
+                          }}>
+                          <DeleteIcon />
+                        </IconButton>
+                      </div>
+                    </Grid>
+                  ))}
+              </Grid>
+            </Box>
             <CardActions sx={{ justifyContent: "center", paddingBottom: 2 }}>
               <Button
                 type="submit"
                 variant="contained"
                 color="primary"
-                sx={{ marginTop: 2, width: "90%" }}>
-                Update
+                sx={{ marginTop: 2, width: "90%" }}
+                disabled={isSubmitting}>
+                {isSubmitting ? <CircularProgress size={24} /> : "Update"}
               </Button>
             </CardActions>
           </form>
