@@ -12,12 +12,14 @@ namespace PetBlog.Controllers
     public class PetPostController : ControllerBase
     {
         private readonly IPetPostRepository _repository;
+        private readonly ILogger<PetPostController> _logger;
         private readonly Cloudinary _cloudinary;
-        private readonly string _defaultImageUrl = "http://res.cloudinary.com/dev7ehsz4/image/upload/v1721350123/ghbgjup4fh4lhvibfdox.png";
+        private readonly string _defaultImageUrl = "https://images.unsplash.com/photo-1554456854-55a089fd4cb2?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D";
 
-        public PetPostController(IPetPostRepository repository, Cloudinary cloudinary)
+        public PetPostController(IPetPostRepository repository, ILogger<PetPostController> logger, Cloudinary cloudinary)
         {
             _repository = repository;
+            _logger = logger;
             _cloudinary = cloudinary;
         }
 
@@ -25,54 +27,73 @@ namespace PetBlog.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<PetPost>>> GetPetPosts()
         {
-            var petPosts = await _repository.GetAllPetPostsAsync();
-            return Ok(petPosts);
+            try
+            {
+                var petPosts = await _repository.GetAllPetPostsAsync();
+                return Ok(petPosts);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred in GetPetPosts");
+                return StatusCode(500, "An error occurred while processing your request.");
+            }
+
         }
 
         //Get: api/PetPosts/1
         [HttpGet("{id}")]
         public async Task<ActionResult<PetPost>> GetPetPost(long id)
         {
-            var petPost = await _repository.GetPetPostByIdAsync(id);
-
-            if (petPost != null)
+            try
             {
+                var petPost = await _repository.GetPetPostByIdAsync(id);
                 return Ok(petPost);
             }
-            return NotFound();
+            catch (KeyNotFoundException)
+            {
+                return NotFound("Post with not found.");
+            }
         }
 
         //Post: api/PetPosts
         [HttpPost]
         public async Task<ActionResult<PetPost>> AddPetPost([FromForm] PetPost petPost, [FromForm] IFormFile[]? images)
         {
-            var imageUrls = new List<string>();
-
-            if (images != null && images.Length > 0)
+            try
             {
-                foreach (var image in images)
+                var imageUrls = new List<string>();
+
+                if (images != null && images.Length > 0)
                 {
-                    var uploadResult = new ImageUploadResult();
-                    using (var stream = image.OpenReadStream())
+                    foreach (var image in images)
                     {
-                        var uploadParams = new ImageUploadParams()
+                        var uploadResult = new ImageUploadResult();
+                        using (var stream = image.OpenReadStream())
                         {
-                            File = new FileDescription(image.FileName, stream)
-                        };
-                        uploadResult = await _cloudinary.UploadAsync(uploadParams);
-                        imageUrls.Add(uploadResult.SecureUrl.AbsoluteUri);
+                            var uploadParams = new ImageUploadParams()
+                            {
+                                File = new FileDescription(image.FileName, stream)
+                            };
+                            uploadResult = await _cloudinary.UploadAsync(uploadParams);
+                            imageUrls.Add(uploadResult.SecureUrl.AbsoluteUri);
+                        }
                     }
+
+                    petPost.ImageUrls = imageUrls;
+                }
+                else
+                {
+                    petPost.ImageUrls = new List<string> { _defaultImageUrl }; // Default image
                 }
 
-                petPost.ImageUrls = imageUrls; // Assuming you have updated your model to handle multiple URLs
+                await _repository.AddPetPostAsync(petPost);
+                return CreatedAtAction(nameof(GetPetPost), new { id = petPost.Id }, petPost);
             }
-            else
+            catch (Exception ex)
             {
-                petPost.ImageUrls = new List<string> { _defaultImageUrl }; // Default image
+                _logger.LogError(ex, "Error occurred in AddPetPost");
+                return Ok("An error occurred while processing your request.");
             }
-
-            await _repository.AddPetPostAsync(petPost);
-            return CreatedAtAction(nameof(GetPetPost), new { id = petPost.Id }, petPost);
         }
 
         //Put: api/PetPosts/1
@@ -132,8 +153,8 @@ namespace PetBlog.Controllers
                 }
 
                 petPost.ImageUrls = imageUrls.Count > 0 ? imageUrls : null;
-
                 await _repository.UpdatePetPostAsync(petPost);
+                return Ok();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -146,22 +167,27 @@ namespace PetBlog.Controllers
                     throw;
                 }
             }
-
-            return NoContent();
         }
 
         //Delete: api/PetPosts/1
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeletePetPost(long id)
         {
-            var petPost = await _repository.GetPetPostByIdAsync(id);
-            if (petPost == null)
+            try
             {
-                return NotFound();
-            }
+                var petPost = await _repository.GetPetPostByIdAsync(id);
+                if (petPost == null)
+                {
+                    return NotFound();
+                }
 
-            await _repository.DeletePetPostAsync(id);
-            return NoContent();
+                await _repository.DeletePetPostAsync(id);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound($"Post not found.");
+            }
         }
     }
 }

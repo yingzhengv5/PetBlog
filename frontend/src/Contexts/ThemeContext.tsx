@@ -40,6 +40,18 @@ export const ThemeProviderWrapper: React.FC<ThemeProviderWrapperProps> = ({
       createTheme({
         palette: {
           mode: darkMode ? "dark" : "light",
+          background: {
+            default: darkMode ? "#1d3557" : "#fefae0",
+          },
+        },
+      components: {
+          MuiAppBar: {
+            styleOverrides: {
+              colorPrimary: {
+                backgroundColor: darkMode ? "#151515" : "#97a97c",
+              },
+            },
+          },
         },
       }),
     [darkMode]

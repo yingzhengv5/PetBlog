@@ -22,11 +22,28 @@ const CreatePost: React.FC = () => {
   const [content, setContent] = useState("");
   const [images, setImages] = useState<File[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState({ title: false, content: false });
   const navigate = useNavigate();
 
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    setIsSubmitting(true); // Start loading
+    const validate = () => {
+    let valid = true;
+    const newErrors = { title: false, content: false };
+    if (!title.trim()) {
+      newErrors.title = true;
+      valid = false;
+    }
+    if (!content.trim()) {
+      newErrors.content = true;
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+    };
+  
+    const handleSubmit = async (event: React.FormEvent) => {
+      event.preventDefault();
+      if (!validate()) return;
+      setIsSubmitting(true); // Start loading
 
     const formData = new FormData();
     formData.append("title", title);
@@ -69,7 +86,7 @@ const CreatePost: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             Create New Post
           </Typography>
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <form onSubmit={handleSubmit} encType="multipart/form-data" noValidate>
             <TextField
               label="Title"
               fullWidth
@@ -77,6 +94,8 @@ const CreatePost: React.FC = () => {
               onChange={(e) => setTitle(e.target.value)}
               margin="normal"
               required
+              error={errors.title}
+              helperText={errors.title ? "Title is required" : ""}
             />
             <TextField
               label="Content"
@@ -87,6 +106,8 @@ const CreatePost: React.FC = () => {
               required
               multiline
               rows={6}
+              error={errors.content}
+              helperText={errors.content ? "Content is required" : ""}
             />
             <Grid container justifyContent="center" sx={{ marginTop: 2 }}>
               <Button
@@ -145,7 +166,6 @@ const CreatePost: React.FC = () => {
               <Button
                 type="submit"
                 variant="contained"
-                // color="primary"
                 sx={{ marginTop: 2, width: "100%" }}
                 disabled={isSubmitting} // Disable button while submitting
               >

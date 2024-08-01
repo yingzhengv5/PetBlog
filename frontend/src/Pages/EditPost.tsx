@@ -26,7 +26,23 @@ const EditPost: React.FC = () => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [deletedImages, setDeletedImages] = useState<string[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false); // Add state for loading
+  const [errors, setErrors] = useState({ title: false, content: false });
 
+  const validate = () => {
+    let valid = true;
+    const newErrors = { title: false, content: false };
+    if (!title.trim()) {
+      newErrors.title = true;
+      valid = false;
+    }
+    if (!content.trim()) {
+      newErrors.content = true;
+      valid = false;
+    }
+    setErrors(newErrors);
+    return valid;
+    };
+  
   useEffect(() => {
     const fetchPost = async () => {
       if (id) {
@@ -42,6 +58,8 @@ const EditPost: React.FC = () => {
 
   const handleUpdate = async (event: React.FormEvent) => {
     event.preventDefault();
+    if (!validate()) return;
+    
     if (id) {
       setIsSubmitting(true); // Start loading
 
@@ -95,10 +113,6 @@ const EditPost: React.FC = () => {
     setExistingImages(existingImages.filter((image) => image !== url));
     setDeletedImages([...deletedImages, url]);
   };
-  // const handleImageDelete = (url: string) => {
-  //   setExistingImages(existingImages.filter((image) => image !== url));
-  //   setDeletedImages([...deletedImages, url]);
-  // };
 
   return (
     <Container maxWidth="sm" sx={{ marginTop: 4 }}>
@@ -107,7 +121,7 @@ const EditPost: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             Edit Post
           </Typography>
-          <form onSubmit={handleUpdate}>
+          <form onSubmit={handleUpdate} encType="multipart/form-data" noValidate>
             <TextField
               label="Title"
               fullWidth
@@ -115,6 +129,8 @@ const EditPost: React.FC = () => {
               onChange={(e) => setTitle(e.target.value)}
               margin="normal"
               required
+              error={errors.title}
+              helperText={errors.title ? "Title is required" : ""}
             />
             <TextField
               label="Content"
@@ -123,11 +139,12 @@ const EditPost: React.FC = () => {
               onChange={(e) => setContent(e.target.value)}
               margin="normal"
               required
+              error={errors.content}
+              helperText={errors.content ? "Content is required" : ""}
             />
             <Button
               component="label"
               variant="contained"
-              // color="secondary"
               startIcon={<DriveFolderUploadIcon />}
               onClick={handleButtonClick}
               sx={{
