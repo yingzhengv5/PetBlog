@@ -6,14 +6,23 @@ using PetBlog.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Load environment variables from .env file
 Env.Load();
+
+// Get MySQL variables
+var server = Environment.GetEnvironmentVariable("MYSQL_SERVER");
+var database = Environment.GetEnvironmentVariable("MYSQL_DATABASE");
+var user = Environment.GetEnvironmentVariable("MYSQL_USER");
+var password = Environment.GetEnvironmentVariable("MYSQL_PASSWORD");
+
+// Build the connection string
+var connectionString = $"Server={server};Database={database};User={user};Password={password};";
 
 //Add services to the container
 builder.Services.AddControllers();
 
 builder.Services.AddDbContext<PetBlogContext>(options =>
-    options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"),
-    new MySqlServerVersion(new Version(8, 0, 22))));
+    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 22))));
 
 builder.Services.AddScoped<IPetPostRepository, PetPostRepository>();
 
