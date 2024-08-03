@@ -40,6 +40,11 @@ const CreatePost: React.FC = () => {
     return valid;
     };
   
+    const handleInputChange = (setter: React.Dispatch<React.SetStateAction<string>>, value: string) => {
+      setter(value);
+      validate();
+    };
+  
     const handleSubmit = async (event: React.FormEvent) => {
       event.preventDefault();
       if (!validate()) return;
@@ -91,7 +96,7 @@ const CreatePost: React.FC = () => {
               label="Title"
               fullWidth
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => handleInputChange(setTitle, e.target.value)}
               margin="normal"
               required
               error={errors.title}
@@ -101,7 +106,7 @@ const CreatePost: React.FC = () => {
               label="Content"
               fullWidth
               value={content}
-              onChange={(e) => setContent(e.target.value)}
+              onChange={(e) => handleInputChange(setContent, e.target.value)}
               margin="normal"
               required
               multiline
