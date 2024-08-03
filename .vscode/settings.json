@@ -1,3 +1,9 @@
 {
-  "cSpell.words": ["Cloudinary", "Dtos", "Hmac", "petpost"]
+  "cSpell.words": [
+    "Cloudinary",
+    "Dtos",
+    "Hasher",
+    "Hmac",
+    "petpost"
+  ]
 }
