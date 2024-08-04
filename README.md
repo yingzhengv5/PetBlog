@@ -49,4 +49,4 @@ The user can upload and delete images. A default image will be used if the user 
 
 1. Toggle light/dark theme
 2. Containerize project using docker
-3. Deployed using Azure
+3. Unit test

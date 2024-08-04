@@ -4,6 +4,7 @@
     "Dtos",
     "Hasher",
     "Hmac",
-    "petpost"
+    "petpost",
+    "Xunit"
   ]
 }

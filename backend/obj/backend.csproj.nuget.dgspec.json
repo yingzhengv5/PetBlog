@@ -49,7 +49,7 @@
             },
             "CloudinaryDotNet": {
               "target": "Package",
-              "version": "[1.12.0, )"
+              "version": "[1.26.2, )"
             },
             "DotNetEnv": {
               "target": "Package",
@@ -69,13 +69,13 @@
               "target": "Package",
               "version": "[8.0.7, )"
             },
-            "Microsoft.IdentityModel.Tokens": {
+            "Microsoft.Extensions.Logging": {
               "target": "Package",
               "version": "[8.0.0, )"
             },
-            "Microsoft.NET.Test.Sdk": {
+            "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
-              "version": "[17.10.0, )"
+              "version": "[8.0.0, )"
             },
             "Moq": {
               "target": "Package",
