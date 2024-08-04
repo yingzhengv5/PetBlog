@@ -156,16 +156,9 @@ namespace PetBlog.Controllers
                 await _repository.UpdatePetPostAsync(petPost);
                 return Ok();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (KeyNotFoundException)
             {
-                if (await _repository.GetPetPostByIdAsync(id) == null)
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return NotFound("Post with not found.");
             }
         }
 
@@ -186,7 +179,7 @@ namespace PetBlog.Controllers
             }
             catch (KeyNotFoundException)
             {
-                return NotFound($"Post not found.");
+                return NotFound();
             }
         }
     }

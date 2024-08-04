@@ -2,7 +2,8 @@ import axios from "axios";
 import { Post } from "../Models/Post";
 
 const api = axios.create({
-  baseURL: "http://localhost:5214/api",
+  baseURL: "/api",
+  // baseURL: import.meta.env.VITE_API_URL || "http://localhost:5214/api",
 });
 
 // Get all posts

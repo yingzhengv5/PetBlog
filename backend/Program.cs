@@ -3,6 +3,7 @@ using DotNetEnv;
 using Microsoft.EntityFrameworkCore;
 using PetBlog.Data;
 using PetBlog.Repositories;
+using Microsoft.Extensions.Hosting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,8 +22,16 @@ var connectionString = $"Server={server};Database={database};User={user};Passwor
 //Add services to the container
 builder.Services.AddControllers();
 
+// builder.Services.AddDbContext<PetBlogContext>(options =>
+//     options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 22))));
+
 builder.Services.AddDbContext<PetBlogContext>(options =>
-    options.UseMySql(connectionString, new MySqlServerVersion(new Version(8, 0, 22))));
+    options.UseMySql(connectionString,
+        new MySqlServerVersion(new Version(8, 0, 22)),
+        mySqlOptions => mySqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(30),
+            errorNumbersToAdd: null)));
 
 builder.Services.AddScoped<IPetPostRepository, PetPostRepository>();
 
@@ -48,6 +57,21 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+// Apply migrations at runtime
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<PetBlogContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
 
 app.UseCors("AllowReactApp");
 
