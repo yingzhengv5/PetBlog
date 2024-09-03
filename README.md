@@ -1,4 +1,4 @@
-Welcome to the PetBlog web app! Here, you can explore interesting stories about pets with their images, edit and delete posts,and view all posts.
+Welcome to the PetBlog web app! Here, you can explore interesting stories about pets with their images, edit and delete posts, and view all posts.
 
 ## Running the Project
 
